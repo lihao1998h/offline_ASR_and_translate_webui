@@ -1,0 +1,7 @@
+models/
+__pycache__/offline_ASR_and_translate.cpython-310.pyc
+.vscode/launch.json
+audio/
+audio_knowledge/
+temp/
+test_data/

@@ -9,20 +9,30 @@ import requests
 from hashlib import md5
 import random
 import torch
+import json
 
 e_time = time.time()
 print(f'import time: {e_time-s_time:.2f}s') 
 
+with open('language_baidu.json', 'r', encoding='utf-8') as f:
+    language_baidu_dict = json.load(f)
+with open('language.json', 'r', encoding='utf-8') as f:
+    language_dict = json.load(f)
+    
+def get_key_by_value(dictionary, value):
+    for key, val in dictionary.items():
+        if val == value:
+            return key
+    return None  # 如果未找到匹配的值，则返回None或其他默认值
+
+
 def check_(lang):
-    if lang == 'ja':
-        lang = 'jp'
-    if lang == 'fi':
-        lang = 'fin'
-        
-    if lang == 'ko':
-        lang = 'kor'
-    if lang == 'zh-cn':
-        lang = 'zh'
+    lang_chinese = get_key_by_value(language_dict, lang)
+
+    # 根据language_baidu_dict中的键值对规则转换lang值
+    if lang_chinese:
+        lang = language_baidu_dict.get(lang_chinese, lang)
+    
     return lang
 
 s_time = time.time()
@@ -42,11 +52,8 @@ funasr_model = AutoModel(model="paraformer-zh", model_revision="v2.0.4",
     
 e_time = time.time()
 print(f'加载模型 time: {e_time-s_time:.2f}s')  
-def translate(query, src_lang, dest_lang):    
+def translate(query, src_lang, dest_lang, appid, secret_key):    
     # 百度翻译
-    appid = ''
-    secret_key = ''
-
     endpoint = 'http://api.fanyi.baidu.com'
     path = '/api/trans/vip/translate'
     url = endpoint + path
@@ -102,7 +109,7 @@ def ASR(audio_path):
     
     return res, info.language
 
-def ASR_and_translate(input, input_lang=None, output_lang='zh'):
+def ASR_and_translate(input, input_lang=None, output_lang='zh', appid=None, appsecret=None):
     s_time = time.time()
     if os.path.isfile(input):
         res, lang = ASR(input)
@@ -121,23 +128,8 @@ def ASR_and_translate(input, input_lang=None, output_lang='zh'):
         return res, res
     else:
         s_time = time.time()
-        translated_text = translate(res, lang, output_lang)  # 翻译成母语
+        translated_text = translate(res, lang, output_lang, appid, appsecret)  # 翻译成母语
         e_time = time.time()
         print(f'translate time: {e_time-s_time:.2f}s')
         return res, translated_text # type: ignore
     
-
-
-if __name__ == "__main__":
-
-    # input_a = 'test_data/zh.wav'
-    # a = ASR_and_translate(input_a, output_lang='zh')
-    # print(input_a, a)
-    
-    # input_b = 'test_data/en2.wav'
-    # b = ASR_and_translate(input_b, output_lang='zh')
-    # print(input_b, b)
-    
-    input_c = "こんにちは、お元気ですか？"
-    c = ASR_and_translate(input_c, output_lang='zh')
-    print(input_c, c)

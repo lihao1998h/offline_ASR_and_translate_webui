@@ -1,3 +1,5 @@
+
+print('程序已启动，请耐心等待')
 import gradio as gr
 import json
 from offline_ASR_and_translate import *
@@ -64,3 +66,5 @@ demo = gr.Interface(
 )
 
 demo.launch(share=False, server_name='127.0.0.1', server_port=7861, quiet=True)
+
+time.sleep(5)

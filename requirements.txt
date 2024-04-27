@@ -1,7 +1,0 @@
-gradio==4.17.0
-faster-whisper
-langdetect
-funasr==1.0.17
-modelscope
-requests
-torchaudio
